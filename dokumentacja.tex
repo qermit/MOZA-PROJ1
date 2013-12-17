@@ -34,7 +34,7 @@
 Dla wzmacniacza szerokopasmowego jak na rysunku dobierz optymalizacyjne wartości Vdc, RF i CF tak by uzyskać maksymalną wartość GBW,
 t.j. iloczynu wzmocnienia dla małych częstotliwości oraz 3dB górnej częstotliwości granicznej.
 Określ wrażliwość funkcji celu na zmiany wartości rezystorów (w optimum).
-Na tej podstawie oszacuj wariancję GBW spowodowaną przez losowe rozrzuty rezystorów o tolerancji 5%.
+Na tej podstawie oszacuj wariancję GBW spowodowaną przez losowe rozrzuty rezystorów o tolerancji 5\%.
 Porównaj uzyskany wyniki ze statystykami obliczonymi przez symulację Monte Carlo.
 Rozważ dwa przypadki rozrzutów rezystorów:
 \begin{itemize}
@@ -42,15 +42,123 @@ Rozważ dwa przypadki rozrzutów rezystorów:
 \item rozrzuty skorelowane (współczynnik korelacji każdej pary rezystorów = 0.7)
 \end{itemize}
 
+\begin{figure}[H]
+  \caption{Schemat układu}
+  \centering
+\includegraphics[scale=0.5]{obrazki/schemat2.png}
+  \label{fig:schemat_ukladu}
+\end{figure}
+
+
 \section{Zadanie optymalizacji}
+Zadanie polega na uzyskaniu możliwie najlepszej wartości GBW, poprzez optymalny dobór wartości RF, CF oraz napięcia Vdc.
 
 \section{Wykonanie zadania}
 
+W zadaniu nie określono wartości rezystora RC2 oraz maksymalnej amplitudy sygnału AC.
+Wybrano przykładową wartość RC2 o wartości 200 Ohm oraz amplitudę 10mV (20mVpp).
+Poprawność dobranych elementów sprawdzono za pomocą symulacji TRAN.
+Kształt sygnału wyjściowego nie był zniekształcony.
+
+\begin{figure}[H]
+  \caption{Schemat układu}
+  \centering
+\includegraphics[scale=0.5]{obrazki/tran.png}
+  \label{fig:schemat_tran}
+\end{figure}
+
+Za pomocą środowiska LTSpice, przeprowadzone zostały wstępne symulacje działania układu.
+Określono wzmocnienie na poziomie 18.3dB (9.35586) oraz górną częstotliwość graniczną ok. 14.7Mhz.
+
+$ GBW = 8.22992 * 14.7Mhz = 120,54M $
+
+\todo[inline]{Wkleić charakterystykę AC}
+\todo[inline]{Wkleić OP}
+
+Określono również punkt pracy układu z wartościami początkowymi elementów.
+
+\section{Funkcja celu}
+Zadanie polega na uzyskaniu możliwie dużego iloczynu wzmocnienia dla małych częstotliwości oraz górnej częstotliwości granicznej.
+Ponieważ metody wykorzystujące zadane algorytmy optymalizacji poszukują minimum funkcji dlatego też funkcja celu wygląda następująco:
+
+$ f_c = -k_u * f_{g3dB} $
+
+\section{Wykonanie zadania}
+
+Zadanie wykonano przy użyciu środowiska Matlab oraz LTSpice. W środowisku Matlab zaimplementowano funkcję celu. Przy użyciu LTSpice natomiast symulowano kolejne parametry zaproponowane przez optymalizator. W każdym kolejnym wywołaniu funkcji celu obliczane były nowe wartości wzmocnienia dla małych częstotliwości i górnej częstotliwości granicznej, na podstawie współrzędnych charakterystyki częstotliwościowej przekazywanych do środowiska Matlab w postaci wyników symulacji LTSpice.
+
 \section{Optymalizacja algorytmem Nelder - Mead}
+
+Algorytm znalazł minimum funkcji celu po 100 iteracjach w których łącznie wywołał 201 razy funkcję celu.
+Poniżej zamieszczono wykres przedstawiający wartość funkcji celu w zależności od iteracji.
+
+\begin{figure}[H]
+  \caption{Wykres wartości funkcji celu w funkcji iteracji}
+  \centering
+\includegraphics[scale=0.7]{obrazki/NF.png}
+  \label{fig:schemat_tran}
+\end{figure}
+
+Można zauważyć, że od około 40 iteracji wartość funkcji celu zmieniała się już nieznacznie.
+Istnieje więc możliwość skrócenia czasu pracy algorytmu, zgadzając się jednoczenie na nieco gorsze parametry.
+Wartość minimalna funkcji celu jaką otrzymał optymalizator to -9.61735e+007.
+Wartości elementów zamieszczono w tabeli poniżej.
+
+\begin{tabular}{|c|c|}
+\hline 
+R5 & 703.486 \\ 
+\hline 
+C1 & 6.57504e-018 \\ 
+\hline 
+V3 & 1.01969 \\ 
+\hline 
+\end{tabular} 
+
+Dla przedstawionych wartości przeprowadzono symulację w środowisku LTSpice, w celu porównania wyników z wartościami początkowymi.
+
+$ k_u = 25dB = 9.3222 V/V  $
+
+$ f_{3gdB} = 17.6Mhz  $
+
+$ GBW = k_u * f_{3gdB} = 164M  $
+
+
+\begin{tabular}{|c|c|c|}
+\hline 
+• & Przed optymalizacją & Po optymalizacji \\ 
+\hline 
+$ k_u $ & 8.2V/V & 9.3V/V \\ 
+\hline 
+$ f_{3gdB} $ & 14.7Mhz & 17.6Mhz \\ 
+\hline 
+$ GBW $ & 120,24M & 164M \\ 
+\hline 
+\end{tabular} 
+
+\todo[inline]{Wkleić charakterystykę AC}
+\todo[inline]{Wkleić wartości}
+
+Podsumowując wyniki dla po przeprowadzeniu optymalizacji algorytmem NM udało się zwiększyć oczekiwaną wartość.
+Dla nowych parametrów wzmacniacz ma lepsze wzmocnienie, oraz wzrosła wartość górnej częstotliwości granicznej.
+%Nieznacznie również oddalono się od nasycenia w przypadku tranzystora Q1 ale też zbliżono się dla tranzystora Q3.
+
 
 \section{Określenie wrażliwości funkcji celu}
 
 \section{Porównanie z metoda Monte-Carlo}
+
+\begin{verbatim}
+mu = 50
+sigma = 5
+M = mu + sigma*randn(1000,2);
+R = [1 0.75; 0.75 1];
+L = chol(R)
+M = M*L;
+x = M(:,1);
+y = M(:,2);
+corr(x,y)
+\end{verbatim}
+
 
 \end{document}
 
@@ -181,7 +289,7 @@ G_{18} = \frac{1}{R_{e}}
 \begin{figure}[H]
   \caption{tranzystor zlinearyzowany na na potrzeby analizy OP}
   \centering
-	\includegraphics[scale=0.2]{images/ebers}
+\includegraphics{schemat.png}
     \includegraphics[scale=0.2]{images/linearyzacja_op}
   \label{fig:linearyzacja OP}
 \end{figure}
