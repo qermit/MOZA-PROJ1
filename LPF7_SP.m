@@ -18,7 +18,7 @@ fid=fopen(par_fname,'w+');
 for n=1:np
     fprintf(fid,'.PARAM %s %g\n',varnames{n},par(n));
 end
-fclose(fid)
+fclose(fid);
 test = sprintf('%s -b %s -r %s',bat_fname,sp_fname,raw_fname);
 [status,result]=system(test);
 raw_data = LTspice2Matlab(raw_fname);
