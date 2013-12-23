@@ -506,3 +506,19 @@ function raw_data = LTspice2Matlab( filename, varargin )
     if isfield( raw_data, 'time_vect' ),      raw_data.time_vect = raw_data.time_vect + general_offset;
     elseif isfield( raw_data, 'freq_vect' ),  raw_data.freq_vect = raw_data.freq_vect + general_offset;
     end
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    

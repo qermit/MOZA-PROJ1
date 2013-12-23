@@ -27,7 +27,7 @@ else
 if isempty(ind)
     fc=0;
 else
-    if(f3db>1000000000)
+    if(f3db>5000000000)
         fc=0;
     elseif(k0_prim<2)
         fc=0;

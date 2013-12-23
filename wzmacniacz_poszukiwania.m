@@ -1,16 +1,16 @@
 clear;
 
-par=[600.0;5.82;0.956];
 par_fname='param.inc';
 par_fname_const='param_const.inc';
 sp_fname='schemat_optim.net';
 bat_fname='LTspice.bat';
 raw_fname='schemat_optim.raw';
-varnames={'R5';'C1';'V3'};
+%varnames={'R5';'C1';'V3'};
+%par=[600.0;5.82;0.956];
 
 
 
-params_start=[5250;200;250;50;50;50;600.0;5.82;0.956];
+params_start=[5250;1000;250;50;50;50;600.0;5.82;0.956];
 varnames_all={'RC1';'RC2';'RC3';'RS';'RE1';'RE3';'R7';'C1';'V3'};
 varnames_to_optim={'R7';'C1';'V3'};
 varnames_to_postoptim={'RC1';'RC2';'RC3';'RS';'RE1';'RE3';'R7'};
@@ -40,8 +40,20 @@ if (do_first)
         params_const, varnames_const,...
         sp_fname,par_fname,par_fname_const, bat_fname,raw_fname,...
         'minval_param', 0.2);
-    fc(params_var);
-    %fc(popt);
+    %fc(params_var);
+    fc(popt);
+    
+    raw_data = LTspice2Matlab(raw_fname);
+    vout_index = strmatch('V(out)', raw_data.variable_name_list, 'exact');
+    vin_index = strmatch('V(in)', raw_data.variable_name_list, 'exact');
+    y_vout=abs(raw_data.variable_mat(vout_index,:));
+    y_vin=real(raw_data.variable_mat(vin_index,:));
+    K0 = y_vout./y_vin;
+    k3db = K0(60)/sqrt(2);
+    ind = find(K0<k3db,1,'first');
+    f3db = raw_data.freq_vect(ind) / 1000000000;
+    fprintf('K0: %d(V/V)\nf3dB: %d\nGBW: %d\n', K0(60), f3db, f3db * K0(60));
+
 end
 
 do_postoptim_montecarlo = 0;

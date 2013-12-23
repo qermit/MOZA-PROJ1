@@ -45,12 +45,13 @@ else
         params_const,varnames_const,...
         sp_fname,par_fname,params_const_fname,bat_fname,raw_fname);
 
+    %y = abs(y);
     k0=y(60);
     k0_prim=k0/0.01;
     k3db = k0/sqrt(2);
     k3db_prim = k0_prim/sqrt(2);
     ind = find(y<k3db,1,'first');
-    f3db = freq(ind) / 1000000;
+    f3db = freq(ind) / 1000000000;
     
 
 if isempty(ind)

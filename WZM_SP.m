@@ -37,4 +37,4 @@ raw_data = LTspice2Matlab(raw_fname);
 freq=raw_data.freq_vect;
 vout_index = strmatch('V(out)', raw_data.variable_name_list, 'exact');
 %vout_index = 5;
-y=real(raw_data.variable_mat(vout_index,:));
+y=abs(raw_data.variable_mat(vout_index,:));

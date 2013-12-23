@@ -28,5 +28,6 @@ R7 N006 N005 {R7}
 * .PARAM R5 600
 * .PARAM V3 0.956
 .inc param.inc
+* Tranzystor = BC107BP
 .backanno
 .end
